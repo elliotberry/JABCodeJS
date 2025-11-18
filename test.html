@@ -5,6 +5,19 @@
         </head>
 
     <body>
-          <script type="module" src="dist/jabcodeJSLib.min.js"></script>
+        <div class="text">
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const jabcode = new JabcodeJSInterface();
+                const data = jabcode.encode_message("Hello, world!");
+                const text = document.querySelector(".text");
+                let img = new Image();
+                img.src = data;
+                text.appendChild(img);
+            });
+        </script>
+        <script type="module" src="dist/jabcodeJSLib.min.js"></script>
         </body> 
 </html> 
