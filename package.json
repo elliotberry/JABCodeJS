@@ -1,19 +1,40 @@
 {
-  "name": "JabcodeJS",
+  "name": "jabcodejs",
   "version": "1.0.0",
-  "description": "",
+  "description": "JABCode Reader/Writer in JavaScript - A high-density 2D barcode library ported from C using Emscripten",
+  "main": "dist/jabcodeJSLib.min.js",
+  "type": "module",
   "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development",
+    "build:native": "node-gyp rebuild",
+    "install": "node-gyp rebuild",
+    "clean": "node-gyp clean",
+    "serve": "http-server -p 8080",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "jabcode",
+    "barcode",
+    "2d-barcode",
+    "qr-code",
+    "encoding",
+    "decoding"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "http-server": "^14.1.1",
+    "node-addon-api": "^7.1.1",
+    "node-gyp": "^10.3.1",
     "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
     "path-browserify": "^1.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jabcode/jabcode"
   }
 }

@@ -1,10 +1,10 @@
-import emscript from './jabcodeJSLib.js';
+import createModule from './jabcodeJSLib.js';
 import ImageProcessor from './ImageProcessor.js';
 import PNGLib from './PNGLib.js';
 
 /**
  * Main interface for JABCode encoding and decoding operations.
- * Provides methods to encode messages into JABCode images and decode JABCode images back to messages.
+ * WebAssembly-enabled version with async module loading.
  * 
  * @class JabcodeJSInterface
  */
@@ -14,6 +14,49 @@ class JabcodeJSInterface {
      * @private
      */
     processor = null;
+
+    /**
+     * @type {Promise|null}
+     * @private
+     */
+    modulePromise = null;
+
+    /**
+     * @type {Object|null}
+     * @private
+     */
+    emscript = null;
+
+    /**
+     * Initializes the Emscripten module (async for WASM).
+     * 
+     * @returns {Promise<Object>} Promise that resolves to the Emscripten module
+     * @private
+     */
+    async initModule() {
+        if (this.emscript) {
+            return this.emscript;
+        }
+
+        if (!this.modulePromise) {
+            this.modulePromise = createModule({
+                // WASM loading options
+                locateFile: (path) => {
+                    // For Node.js, use __dirname
+                    if (typeof __dirname !== 'undefined') {
+                        return require('path').join(__dirname, path);
+                    }
+                    // For browser, use relative path
+                    return path;
+                },
+                // Memory options
+                wasmMemory: undefined, // Let Emscripten manage
+            });
+        }
+
+        this.emscript = await this.modulePromise;
+        return this.emscript;
+    }
 
     /**
      * Gets or creates the ImageProcessor instance.
@@ -34,13 +77,15 @@ class JabcodeJSInterface {
      * @param {string} msg - The message to encode
      * @param {number|null} [symbol_num=null] - Optional symbol number (uses default if null)
      * @param {number|null} [color_num=null] - Optional color number (uses default if null)
-     * @returns {string} Base64-encoded PNG data URI
+     * @returns {Promise<string>} Promise that resolves to base64-encoded PNG data URI
      * @throws {Error} If encoding fails or Emscripten module is not initialized
      */
-    encode_message(msg, symbol_num = null, color_num = null) {
+    async encode_message(msg, symbol_num = null, color_num = null) {
         if (typeof msg !== 'string') {
             throw new Error('Message must be a string');
         }
+
+        const emscript = await this.initModule();
 
         if (!emscript || typeof emscript.ccall !== 'function') {
             throw new Error('Emscripten module not initialized');
@@ -113,9 +158,11 @@ class JabcodeJSInterface {
      * @returns {Promise<string>} Promise that resolves to the decoded message
      * @throws {Error} If decoding fails or Emscripten module is not initialized
      */
-    decode_message(img) {
+    async decode_message(img) {
+        const emscript = await this.initModule();
+
         if (!emscript || typeof emscript.ccall !== 'function') {
-            return Promise.reject(new Error('Emscripten module not initialized'));
+            throw new Error('Emscripten module not initialized');
         }
 
         return this.getProcessor()
@@ -184,3 +231,4 @@ class JabcodeJSInterface {
 }
 
 export default JabcodeJSInterface;
+

@@ -1,26 +1,29 @@
-const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
     entry: './src/js/JabcodeJSInterface.js',
-    /*output: {
+    output: {
         filename: 'jabcodeJSLib.min.js',
-        path: path.resolve(__dirname, 'dist')
-    },*/
+        path: path.resolve(__dirname, 'dist'),
+        library: {
+            name: 'JabcodeJSInterface',
+            type: 'umd',
+            export: 'default'
+        },
+        globalObject: 'this'
+    },
     resolve: {
         fallback: {
-            path: require.resolve("path-browserify"),
-            fs:false
+            path: 'path-browserify',
+            fs: false
         }
     },
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          keep_fnames: false,
-          keep_classnames:true
-        }
-      })
-    ]
-  }
+    mode: 'production',
+    optimization: {
+        minimize: true
+    }
 };

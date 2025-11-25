@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JABCodeJS - Browser Example</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 100px;
+            font-family: monospace;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        .result img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .loading {
+            color: #856404;
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        .info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔷 JABCodeJS Browser Example</h1>
+        <p>This example demonstrates encoding and decoding JABCode in the browser using the Emscripten build.</p>
+        
+        <div class="input-group">
+            <label for="messageInput">Message to Encode:</label>
+            <textarea id="messageInput" placeholder="Enter your message here...">Hello, JABCode!</textarea>
+        </div>
+        
+        <div class="grid">
+            <div class="input-group">
+                <label for="symbolNumber">Symbol Number:</label>
+                <input type="number" id="symbolNumber" value="1" min="1" max="61">
+                <div class="info">Number of symbols (1-61)</div>
+            </div>
+            
+            <div class="input-group">
+                <label for="colorNumber">Color Number:</label>
+                <input type="number" id="colorNumber" value="8" min="4" max="256" step="4">
+                <div class="info">Number of colors (4, 8, 16, 32, 64, 128, or 256)</div>
+            </div>
+        </div>
+        
+        <button id="encodeBtn" onclick="encodeMessage()">Encode Message</button>
+        <button id="decodeBtn" onclick="decodeImage()" disabled>Decode Image</button>
+        <button onclick="loadExample()">Load Example</button>
+        <button onclick="clearResults()">Clear</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script type="module">
+        // Import the JABCode interface
+        // Note: In a real application, you would import from the built bundle
+        // import JabcodeJSInterface from '../dist/jabcodeJSLib.min.js';
+        
+        // For this example, we'll use a placeholder that shows the structure
+        // In production, uncomment the import above and use the actual library
+        
+        let jabcode = null;
+        let currentImageDataUri = null;
+        
+        // Initialize the library
+        async function initLibrary() {
+            try {
+                // In production, use:
+                // import JabcodeJSInterface from '../dist/jabcodeJSLib.min.js';
+                // jabcode = new JabcodeJSInterface();
+                
+                // For demo purposes, we'll show the structure
+                console.log('JABCodeJS library would be initialized here');
+                document.getElementById('result').innerHTML = `
+                    <div class="result loading">
+                        <strong>Note:</strong> This is a demo HTML structure. 
+                        To use in production, build the package and import from the dist folder.
+                        <br><br>
+                        <code>import JabcodeJSInterface from './dist/jabcodeJSLib.min.js';</code>
+                    </div>
+                `;
+            } catch (error) {
+                showError('Failed to initialize library: ' + error.message);
+            }
+        }
+        
+        window.encodeMessage = async function() {
+            const message = document.getElementById('messageInput').value;
+            const symbolNum = parseInt(document.getElementById('symbolNumber').value) || 1;
+            const colorNum = parseInt(document.getElementById('colorNumber').value) || 8;
+            
+            if (!message.trim()) {
+                showError('Please enter a message to encode');
+                return;
+            }
+            
+            const encodeBtn = document.getElementById('encodeBtn');
+            encodeBtn.disabled = true;
+            encodeBtn.textContent = 'Encoding...';
+            
+            try {
+                // In production:
+                // const imageDataUri = await jabcode.encode_message(message, symbolNum, colorNum);
+                
+                // Demo placeholder
+                showResult('Encoding...', 'loading');
+                
+                // Simulate encoding (remove this in production)
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                showResult(`
+                    <strong>✓ Encoded successfully!</strong><br>
+                    <div class="info">Message: "${message}"</div>
+                    <div class="info">Symbols: ${symbolNum}, Colors: ${colorNum}</div>
+                    <div class="info">In production, the JABCode image would appear here.</div>
+                `, 'success');
+                
+                document.getElementById('decodeBtn').disabled = false;
+                currentImageDataUri = 'demo-image-data'; // In production, use actual imageDataUri
+                
+            } catch (error) {
+                showError('Encoding failed: ' + error.message);
+            } finally {
+                encodeBtn.disabled = false;
+                encodeBtn.textContent = 'Encode Message';
+            }
+        };
+        
+        window.decodeImage = async function() {
+            if (!currentImageDataUri) {
+                showError('No image to decode. Please encode a message first.');
+                return;
+            }
+            
+            const decodeBtn = document.getElementById('decodeBtn');
+            decodeBtn.disabled = true;
+            decodeBtn.textContent = 'Decoding...';
+            
+            try {
+                // In production:
+                // const decodedMessage = await jabcode.decode_message(currentImageDataUri);
+                
+                showResult('Decoding...', 'loading');
+                
+                // Simulate decoding (remove this in production)
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const originalMessage = document.getElementById('messageInput').value;
+                showResult(`
+                    <strong>✓ Decoded successfully!</strong><br>
+                    <div class="info">Decoded message: "${originalMessage}"</div>
+                    <div class="info">In production, this would decode the actual JABCode image.</div>
+                `, 'success');
+                
+            } catch (error) {
+                showError('Decoding failed: ' + error.message);
+            } finally {
+                decodeBtn.disabled = false;
+                decodeBtn.textContent = 'Decode Image';
+            }
+        };
+        
+        window.loadExample = function() {
+            document.getElementById('messageInput').value = 'This is an example message for JABCode encoding! 🌟';
+            document.getElementById('symbolNumber').value = '1';
+            document.getElementById('colorNumber').value = '8';
+        };
+        
+        window.clearResults = function() {
+            document.getElementById('result').innerHTML = '';
+            currentImageDataUri = null;
+            document.getElementById('decodeBtn').disabled = true;
+        };
+        
+        function showResult(message, type = 'success') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+        
+        function showError(message) {
+            showResult(`<strong>✗ Error:</strong> ${message}`, 'error');
+        }
+        
+        // Initialize on page load
+        initLibrary();
+    </script>
+</body>
+</html>
+
